@@ -8,14 +8,18 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class GiphyModel {
-    int id;
-    String type;
-    String title;
-    String src;
-    String author;
-    Date date;
-    int viewCount;
-    int viewOrder;
+    public int id;
+    public String type;
+    public String title;
+    public String src;
+    public String author;
+    public Date date;
+    public int viewCount;
+    public int viewOrder;
+
+    public GiphyModel() {
+
+    }
 
     public GiphyModel(JSONObject object) throws JSONException {
         id = (int)object.get("id");
