@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.application.ravnandroidclient.client.Client;
+
 public class MainActivity extends AppCompatActivity {
 
     Client mClient = new Client();
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.bt_list).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                mClient.list();
             }
         });
         findViewById(R.id.bt_add).setOnClickListener(new View.OnClickListener() {
