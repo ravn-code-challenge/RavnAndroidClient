@@ -64,7 +64,7 @@ public class UpdateActivity extends EditActivity {
         cal.setTime(model.date);
         String date = DateFormat.format("MM/dd/yy", cal).toString();
 
-        mTvViews.setText("views: " + Integer.toString(model.viewCount));
+        mTvViews.setText("views: " + Long.toString(model.viewCount));
         mTvDate.setText("Updated: " + date);
         mEtTitle.setText(model.title);
         mEtAuthor.setText(model.author);
