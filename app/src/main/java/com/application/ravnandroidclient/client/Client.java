@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
     final static String TAG = "Client";
@@ -15,6 +17,7 @@ public class Client {
     Socket mSocket;
     DataOutputStream dOut;
     DataInputStream dIn;
+    public List<GiphyModel> mGiphyModels = new ArrayList<>();
 
     public void connect() {
         //Check if it is already connected.
