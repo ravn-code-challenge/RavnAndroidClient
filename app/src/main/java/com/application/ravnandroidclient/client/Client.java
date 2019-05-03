@@ -20,14 +20,14 @@ import java.util.List;
 
 public class Client {
     final static String TAG = "Client";
-    final static String ADDRESS = "192.168.0.4";
+    final static String ADDRESS = "10.39.66.57";
     final static int PORT = 8381;
     Socket mSocket;
     DataOutputStream dOut;
     DataInputStream dIn;
 
 
-    public List<GiphyModel> mGiphyModels = new ArrayList<>();
+    public GiphyList mGiphyList;
     public List<ClientSubscriber> mClientSubscribers = new ArrayList<>();
 
     Gson gson;
@@ -56,10 +56,10 @@ public class Client {
         mClientSubscribers.remove(s);
     }
 
-    private void notifySubscribers(List<GiphyModel> giphyModels) {
-        mGiphyModels = giphyModels;
+    private void notifySubscribers(GiphyList giphyModels) {
+        mGiphyList = giphyModels;
         for(ClientSubscriber subscriber : mClientSubscribers) {
-            subscriber.updateGiphyModels(mGiphyModels);
+            subscriber.updateGiphyModels(mGiphyList);
         }
     }
 
@@ -155,22 +155,21 @@ public class Client {
     }
 
     public GiphyModel getModel(long id) {
-        for(GiphyModel model : mGiphyModels) {
+        for(GiphyModel model : mGiphyList.models) {
             if(model.id == id) return model;
         }
         return null;
     }
 
 
-    class ListAsyncTask extends AsyncTask<Void, Void, List<GiphyModel>> {
+    class ListAsyncTask extends AsyncTask<Void, Void, GiphyList> {
 
         @Override
-        protected List<GiphyModel> doInBackground(Void... voids) {
+        protected GiphyList doInBackground(Void... voids) {
             try {
                 dOut.writeUTF("list");
-                TypeToken<List<GiphyModel>> token = new TypeToken<List<GiphyModel>>() {};
-                List<GiphyModel> animals = gson.fromJson(dIn.readUTF(), token.getType());
-                return animals;
+                GiphyList giphyList = gson.fromJson(dIn.readUTF(), GiphyList.class);
+                return giphyList;
             }
             catch(IOException e) {
                 Log.d(TAG, "Error connecting socket" + e);
@@ -179,7 +178,7 @@ public class Client {
         }
 
         @Override
-        protected void onPostExecute(List<GiphyModel> models) {
+        protected void onPostExecute(GiphyList models) {
             if(models != null) {
                 notifySubscribers(models);
             }

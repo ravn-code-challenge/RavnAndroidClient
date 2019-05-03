@@ -3,4 +3,17 @@
     <string name="Open">open</string>
     <string name="Close">close</string>
 
+    <string-array name="sort_fields">
+        <item>ID</item>
+        <item>Type</item>
+        <item>Title</item>
+        <item>Author</item>
+        <item>Date</item>
+        <item>View Count</item>
+    </string-array>
+
+    <string-array name="sort_types">
+        <item>Ascending</item>
+        <item>Descending</item>
+    </string-array>
 </resources>

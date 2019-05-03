@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,15 +12,13 @@ import android.widget.ImageView;
 
 import com.application.ravnandroidclient.GlideApp;
 import com.application.ravnandroidclient.R;
+import com.application.ravnandroidclient.client.GiphyList;
 import com.application.ravnandroidclient.client.GiphyModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GiphyAdapter extends RecyclerView.Adapter<GiphyAdapter.GiphyViewHolder> {
 
     private static final String TAG = "GiphyAdapter";
-    private List<GiphyModel> mGiphyModels = new ArrayList<>();
+    private GiphyList mGiphyList;
     private Context mContext;
     GiphyClickedListener mGiphyClickedListener;
 
@@ -54,11 +51,11 @@ public class GiphyAdapter extends RecyclerView.Adapter<GiphyAdapter.GiphyViewHol
         circularProgressDrawable.setCenterRadius(30f);
         circularProgressDrawable.start();
 
-        holder.mGiphyModel = mGiphyModels.get(position);
+        holder.mGiphyModel = mGiphyList.models.get(position);
 
-        Log.d(TAG, "GiphyAdapter loading: " + mGiphyModels.get(position).src);
+        Log.d(TAG, "GiphyAdapter loading: " + mGiphyList.models.get(position).src);
         GlideApp.with(mContext)
-                .load(mGiphyModels.get(position).src)
+                .load(mGiphyList.models.get(position).src)
                 .placeholder(circularProgressDrawable)
                 .centerCrop()
                 .into(holder.mImageView);
@@ -76,11 +73,12 @@ public class GiphyAdapter extends RecyclerView.Adapter<GiphyAdapter.GiphyViewHol
 
     @Override
     public int getItemCount() {
-        return mGiphyModels.size();
+        if(mGiphyList == null) return 0;
+        return mGiphyList.models.size();
     }
 
-    public void updateList(List<GiphyModel> models) {
-        mGiphyModels = models;
+    public void updateList(GiphyList models) {
+        mGiphyList = models;
         notifyDataSetChanged();
     }
 }

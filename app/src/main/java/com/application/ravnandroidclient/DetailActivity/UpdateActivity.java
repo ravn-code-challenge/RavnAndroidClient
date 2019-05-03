@@ -27,7 +27,7 @@ public class UpdateActivity extends EditActivity {
     UpdateAsyncTask mUpdateAsyncTask;
 
 
-    public static Intent getUpdateIntent(Context context, long id) {
+    public static Intent getIntent(Context context, long id) {
         Intent intent = new Intent(context, UpdateActivity.class);
         intent.putExtra(GIPHY_ID_KEY, id);
         return intent;

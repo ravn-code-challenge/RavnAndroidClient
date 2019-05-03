@@ -28,7 +28,7 @@ public class AddActivity extends EditActivity {
     AppCompatActivity appCompatActivity;
     AddAsyncTask mAddAsyncTask;
 
-    public static Intent getUpdateIntent(Context context) {
+    public static Intent getIntent(Context context) {
         return new Intent(context, AddActivity.class);
     }
 

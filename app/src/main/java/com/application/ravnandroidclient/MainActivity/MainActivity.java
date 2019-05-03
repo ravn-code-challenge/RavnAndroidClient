@@ -8,18 +8,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import com.application.ravnandroidclient.DetailActivity.AddActivity;
 import com.application.ravnandroidclient.DetailActivity.UpdateActivity;
 import com.application.ravnandroidclient.R;
+import com.application.ravnandroidclient.SortActivity;
 import com.application.ravnandroidclient.client.Client;
 import com.application.ravnandroidclient.client.ClientSubscriber;
+import com.application.ravnandroidclient.client.GiphyList;
 import com.application.ravnandroidclient.client.GiphyModel;
 
 import java.util.List;
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
         mGiphyAdapter = new GiphyAdapter(this, new GiphyClickedListener() {
             @Override
             public void onGiphyClicked(GiphyModel model) {
-                startActivity(UpdateActivity.getUpdateIntent(mContext, model.id));
+                startActivity(UpdateActivity.getIntent(mContext, model.id));
             }
         });
         mRecyclerView.setAdapter(mGiphyAdapter);
@@ -89,10 +88,11 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
                         break;
                     case R.id.add_data:
                         Log.d(TAG, "Add data called");
-                        startActivity(AddActivity.getUpdateIntent(mContext));
+                        startActivity(AddActivity.getIntent(mContext));
                         break;
                     case R.id.sort_data:
                         Log.d(TAG, "Sort Data");
+                        startActivity(SortActivity.getIntent(mContext));
                         break;
                     default:
                         return true;
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
     }
 
     @Override
-    public void updateGiphyModels(List<GiphyModel> newList) {
+    public void updateGiphyModels(GiphyList newList) {
         Log.d(TAG, "We got new list in Mainactiity");
         if(mGiphyAdapter != null) {
             mGiphyAdapter.updateList(newList);
