@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -21,8 +22,6 @@ import java.util.Date;
 
 
 public class EditActivity extends AppCompatActivity {
-
-
 
     private static final String UPDATE_OR_ADD_KEY = "update_or_add";
 
@@ -56,6 +55,7 @@ public class EditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mContext =  this;
         setContentView(R.layout.activity_detail);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mProgressBar = findViewById(R.id.progress_bar);
         mProgressBar.setVisibility(View.INVISIBLE);
@@ -116,5 +116,16 @@ public class EditActivity extends AppCompatActivity {
         else {
             return null;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            onBackPressed();  return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,14 +20,15 @@ import java.util.List;
 
 public class Client {
     final static String TAG = "Client";
-    final static String ADDRESS = "10.39.66.57";
+    final static String ADDRESS = "192.168.0.4";
     final static int PORT = 8381;
     Socket mSocket;
     DataOutputStream dOut;
     DataInputStream dIn;
+
+
     public List<GiphyModel> mGiphyModels = new ArrayList<>();
-
-
+    public List<ClientSubscriber> mClientSubscribers = new ArrayList<>();
 
     Gson gson;
 
@@ -44,6 +46,21 @@ public class Client {
                 .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (
                         date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
                 .create();
+    }
+
+    public void registerSubscriber(ClientSubscriber subscriber) {
+        mClientSubscribers.add(subscriber);
+    }
+
+    public void removeSubscriber(ClientSubscriber s) {
+        mClientSubscribers.remove(s);
+    }
+
+    private void notifySubscribers(List<GiphyModel> giphyModels) {
+        mGiphyModels = giphyModels;
+        for(ClientSubscriber subscriber : mClientSubscribers) {
+            subscriber.updateGiphyModels(mGiphyModels);
+        }
     }
 
     public void connect() {
@@ -86,6 +103,7 @@ public class Client {
             String response = dIn.readUTF();
             if(response.toLowerCase().equals("ok")) {
                 Log.d(TAG, "Adding was successfull");
+                list();
                 return true;
             }
             Log.d(TAG, "Adding was not successfull");
@@ -96,19 +114,75 @@ public class Client {
         }
     }
 
+    /**
+     *
+     * @param giphyModel
+     * @return
+     */
+    public boolean update(GiphyModel giphyModel) {
+        try {
 
-    class ListAsyncTask extends AsyncTask<Void, Void, Void> {
+            dOut.writeUTF("update/" + gson.toJson(giphyModel));
+            String response = dIn.readUTF();
+            if(response.toLowerCase().equals("ok")) {
+                Log.d(TAG, "Updating was successfull");
+                list();
+                return true;
+            }
+            Log.d(TAG, "Updating was not successfull");
+            return false;
+        }
+        catch (IOException e) {
+            return false;
+        }
+    }
+
+    public boolean remove(long giphyId) {
+        try {
+            dOut.writeUTF("remove/" + giphyId);
+            String response = dIn.readUTF();
+            if(response.toLowerCase().equals("ok")) {
+                Log.d(TAG, "Deleting was successfull");
+                list(); //Get the new list
+                return true;
+            }
+            Log.d(TAG, "Deleting was not successfull");
+            return false;
+        }
+        catch (IOException e) {
+            return false;
+        }
+    }
+
+    public GiphyModel getModel(long id) {
+        for(GiphyModel model : mGiphyModels) {
+            if(model.id == id) return model;
+        }
+        return null;
+    }
+
+
+    class ListAsyncTask extends AsyncTask<Void, Void, List<GiphyModel>> {
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected List<GiphyModel> doInBackground(Void... voids) {
             try {
                 dOut.writeUTF("list");
-                Log.d(TAG, "Got Results: " + dIn.readUTF());
+                TypeToken<List<GiphyModel>> token = new TypeToken<List<GiphyModel>>() {};
+                List<GiphyModel> animals = gson.fromJson(dIn.readUTF(), token.getType());
+                return animals;
             }
             catch(IOException e) {
                 Log.d(TAG, "Error connecting socket" + e);
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<GiphyModel> models) {
+            if(models != null) {
+                notifySubscribers(models);
+            }
         }
     }
 

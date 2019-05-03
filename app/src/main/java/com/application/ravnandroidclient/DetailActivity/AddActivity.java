@@ -23,6 +23,11 @@ import java.util.Locale;
 
 public class AddActivity extends EditActivity {
 
+    private static final String TAG = "AddActivity";
+
+    AppCompatActivity appCompatActivity;
+    AddAsyncTask mAddAsyncTask;
+
     public static Intent getUpdateIntent(Context context) {
         return new Intent(context, AddActivity.class);
     }
@@ -31,7 +36,7 @@ public class AddActivity extends EditActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final AppCompatActivity appCompatActivity = this;
+        appCompatActivity = this;
 
         mIvGiphy.setVisibility(View.GONE);
         findViewById(R.id.frame_giphy).setVisibility(View.GONE);
@@ -44,12 +49,13 @@ public class AddActivity extends EditActivity {
         mBtUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, "Add button clicked");
                 GiphyModel model =  getValidModelFromFields();
                 if(model != null) {
-
                     //Since we're adding, we should ensure viewcount is now zero
                     model.viewCount = 0;
-                    new AddAsyncTask(model).execute();
+                    mAddAsyncTask = new AddAsyncTask(model);
+                    mAddAsyncTask.execute();
                 }
 
             }
@@ -63,6 +69,19 @@ public class AddActivity extends EditActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mAddAsyncTask != null) {
+            mAddAsyncTask.cancel(true);
+        }
+
+
+    }
+
+    public void finishAdd() {
+        finish();
+    }
 
     class AddAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -79,8 +98,7 @@ public class AddActivity extends EditActivity {
 
         @Override
         protected void onPostExecute(Boolean result) {
-
+            finishAdd();
         }
     }
-
 }

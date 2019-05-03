@@ -2,23 +2,34 @@ package com.application.ravnandroidclient.DetailActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 
 import com.application.ravnandroidclient.GlideApp;
+import com.application.ravnandroidclient.client.Client;
 import com.application.ravnandroidclient.client.GiphyModel;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class UpdateActivity extends EditActivity {
 
-    public static Intent getUpdateIntent(Context context) {
+    private static final String TAG = "UpdateActivity";
+
+    GiphyModel model;
+    private static final String GIPHY_ID_KEY = "giphy_id";
+    DeleteAsyncTask mDeleteAsyncTask;
+    UpdateAsyncTask mUpdateAsyncTask;
+
+
+    public static Intent getUpdateIntent(Context context, long id) {
         Intent intent = new Intent(context, UpdateActivity.class);
+        intent.putExtra(GIPHY_ID_KEY, id);
         return intent;
     }
 
@@ -29,6 +40,14 @@ public class UpdateActivity extends EditActivity {
         mBtUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mUpdateAsyncTask == null) {
+                    GiphyModel modelFromFields =  getValidModelFromFields();
+                    model.title = modelFromFields.title;
+                    model.author = modelFromFields.author;
+                    model.src = modelFromFields.src;
+                    mUpdateAsyncTask = new UpdateAsyncTask(model);
+                    mUpdateAsyncTask.execute();
+                }
 
             }
         });
@@ -36,7 +55,10 @@ public class UpdateActivity extends EditActivity {
         mBtDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(mDeleteAsyncTask == null) {
+                    mDeleteAsyncTask = new DeleteAsyncTask(model.id);
+                    mDeleteAsyncTask.execute();
+                }
             }
         });
 
@@ -45,18 +67,12 @@ public class UpdateActivity extends EditActivity {
         circularProgressDrawable.setCenterRadius(30f);
         circularProgressDrawable.start();
 
-        GiphyModel model = new GiphyModel();
-        model.id = 1;
-        model.type = "GIF";
-        model.title = "Aquaman old chum";
-        model.author = "Stan Lee";
-        model.src = "https://media0.giphy.com/media/Hz6upbrOw14sM/200w.gif";
-        model.date = new Date();
-        model.viewCount = 0;
-        model.viewOrder = -1;
+
+        model = Client.getClient().getModel(getIntent().getLongExtra(GIPHY_ID_KEY, 1));
+        Log.d(TAG, "Model id: " + model.id);
 
         GlideApp.with(this)
-                .load("https://media0.giphy.com/media/Hz6upbrOw14sM/200w.gif")
+                .load(model.src)
                 .placeholder(circularProgressDrawable)
                 .centerCrop()
                 .into(mIvGiphy);
@@ -71,5 +87,58 @@ public class UpdateActivity extends EditActivity {
         mEtGiphySrc.setText(model.src);
 
 
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mUpdateAsyncTask != null) mUpdateAsyncTask.cancel(true );
+        if(mDeleteAsyncTask != null) mDeleteAsyncTask.cancel(true );
+    }
+
+    public void finishTask() {
+        finish();
+    }
+
+    class UpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        GiphyModel mGiphyModel;
+
+        UpdateAsyncTask(GiphyModel giphyModel) {
+            mGiphyModel = giphyModel;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return Client.getClient().update(mGiphyModel);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            finishTask();
+        }
+    }
+
+    class DeleteAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        long giphyId;
+
+        DeleteAsyncTask(long giphyId) {
+            this.giphyId = giphyId;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            Log.d(TAG, "Deleting id: " + giphyId);
+            return Client.getClient().remove(giphyId);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if(result) {
+                finishTask();
+            }
+        }
     }
 }
