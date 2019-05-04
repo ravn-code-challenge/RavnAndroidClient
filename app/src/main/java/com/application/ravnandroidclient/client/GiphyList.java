@@ -83,27 +83,26 @@ public class GiphyList {
     }
 
 
-    public SortField getSortField(String sortField) {
-        String sortFieldLower = sortField.toLowerCase();
-        if(sortFieldLower.equals(ID_STRING)) {
+    public SortField getSortField() {
+        if(sortField.equals(ID_STRING)) {
             return SortField.ID;
         }
-        else if(sortFieldLower.equals(TYPE_STRING)) {
+        else if(sortField.equals(TYPE_STRING)) {
             return SortField.TYPE;
         }
-        else if(sortFieldLower.equals(TITLE_STRING)) {
+        else if(sortField.equals(TITLE_STRING)) {
             return SortField.TITLE;
         }
-        else if(sortFieldLower.equals(SRC_STRING)) {
+        else if(sortField.equals(SRC_STRING)) {
             return SortField.SRC;
         }
-        else if(sortFieldLower.equals(AUTHOR_STRING)) {
+        else if(sortField.equals(AUTHOR_STRING)) {
             return SortField.AUTHOR;
         }
-        else if(sortFieldLower.equals(DATE_STRING)) {
+        else if(sortField.equals(DATE_STRING)) {
             return SortField.DATE;
         }
-        else if(sortFieldLower.equals(VIEW_COUNT_STRING)) {
+        else if(sortField.equals(VIEW_COUNT_STRING)) {
             return SortField.VIEW_COUNT;
         }
         else {

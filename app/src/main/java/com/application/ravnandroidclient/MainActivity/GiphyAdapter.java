@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.application.ravnandroidclient.GlideApp;
 import com.application.ravnandroidclient.R;
@@ -30,12 +31,14 @@ public class GiphyAdapter extends RecyclerView.Adapter<GiphyAdapter.GiphyViewHol
 
     public class GiphyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public GiphyModel mGiphyModel;
-        public ImageView mImageView;
+        public ImageView mIvGiphy;
+        public TextView mTvSortInfo;
 
         public GiphyViewHolder(View v) {
             super(v);
             v.setOnClickListener(this);
-            mImageView = v.findViewById(R.id.iv_giphy);
+            mIvGiphy = v.findViewById(R.id.iv_giphy);
+            mTvSortInfo = v.findViewById(R.id.tv_sort_info);
         }
 
         @Override
@@ -58,7 +61,10 @@ public class GiphyAdapter extends RecyclerView.Adapter<GiphyAdapter.GiphyViewHol
                 .load(mGiphyList.models.get(position).src)
                 .placeholder(circularProgressDrawable)
                 .centerCrop()
-                .into(holder.mImageView);
+                .into(holder.mIvGiphy);
+
+        holder.mTvSortInfo.setText(mGiphyList.sortField + ": " +
+                holder.mGiphyModel.getSortFieldValue(mGiphyList.getSortField()));
 
     }
 
