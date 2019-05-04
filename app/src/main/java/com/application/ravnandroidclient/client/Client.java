@@ -20,7 +20,7 @@ import java.util.List;
 
 public class Client {
     final static String TAG = "Client";
-    final static String ADDRESS = "10.39.66.57";
+    final static String ADDRESS = "192.168.0.4";
     final static int PORT = 8381;
     Socket mSocket;
     DataOutputStream dOut;
@@ -94,7 +94,7 @@ public class Client {
     }
 
     /**
-     * Is done synchronously, returns true if succesfull
+     * Is done synchronously, returns true if succesful
      * @param giphyModel
      */
     public boolean add(GiphyModel giphyModel) {
@@ -115,10 +115,26 @@ public class Client {
     }
 
     /**
-     *
-     * @param giphyModel
+     * Is done synchronously, returns true if successful
+     * @param sortField
+     * @param sortType
      * @return
      */
+    public boolean sort(GiphyList.SortField sortField, GiphyList.SortType sortType) {
+        mGiphyList.setSortField(sortField);
+        mGiphyList.setSortType(sortType);
+        Log.d(TAG, "Sort field: " + mGiphyList.sortField);
+        Log.d(TAG, "Sort type: " + mGiphyList.sortType);
+        return true;
+    }
+
+
+
+        /**
+         *
+         * @param giphyModel
+         * @return
+         */
     public boolean update(GiphyModel giphyModel) {
         try {
 

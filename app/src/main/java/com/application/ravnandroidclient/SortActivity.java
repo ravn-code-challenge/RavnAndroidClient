@@ -2,15 +2,26 @@ package com.application.ravnandroidclient;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
+
+import com.application.ravnandroidclient.client.Client;
+import com.application.ravnandroidclient.client.GiphyList;
+import com.application.ravnandroidclient.client.GiphyModel;
 
 
 public class SortActivity extends AppCompatActivity {
+
+    Spinner fieldSpinner;
+    Spinner sortTypeSpinner;
+    SortAsyncTask mSortAsyncTask;
 
     public static Intent getIntent(Context context) {
         return new Intent(context, SortActivity.class);
@@ -24,28 +35,47 @@ public class SortActivity extends AppCompatActivity {
         setUpFieldAdapter();
         setUpSortAdapter();
 
+        Button sortButton = findViewById(R.id.bt_run_sort);
+        sortButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSortAsyncTask = new SortAsyncTask(fieldSpinner.getSelectedItemPosition(),
+                        sortTypeSpinner.getSelectedItemPosition());
+                mSortAsyncTask.execute();
+            }
+        });
+
+        Button cancelButton = findViewById(R.id.bt_sort_cancel);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     public void setUpFieldAdapter() {
-        Spinner spinner = (Spinner) findViewById(R.id.spinner_field);
-// Create an ArrayAdapter using the string array and a default spinner layout
+        fieldSpinner = findViewById(R.id.spinner_field);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_fields, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+        fieldSpinner.setAdapter(adapter);
+        fieldSpinner.setSelection(Client.getClient().mGiphyList.getSortType().ordinal());
     }
 
     public void setUpSortAdapter() {
-        Spinner spinner = (Spinner) findViewById(R.id.spinner_type);
-// Create an ArrayAdapter using the string array and a default spinner layout
+        sortTypeSpinner = findViewById(R.id.spinner_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_types, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+        sortTypeSpinner.setAdapter(adapter);
+        sortTypeSpinner.setSelection(Client.getClient().mGiphyList.getSortType().ordinal());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mSortAsyncTask.cancel(true);
     }
 
     @Override
@@ -58,4 +88,32 @@ public class SortActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void finishAdd() {
+        finish();
+    }
+
+    class SortAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        int sortField = 0;
+        int sortType = 0;
+
+        SortAsyncTask(int sortField, int sortType) {
+            this.sortField = sortField;
+            this.sortType = sortType;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            GiphyList.SortField sortFieldEnum = GiphyList.SortField.values()[sortField];
+            GiphyList.SortType sortTypeEnum = GiphyList.SortType.values()[sortType];
+            return Client.getClient().sort(sortFieldEnum, sortTypeEnum);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            finishAdd();
+        }
+    }
+
 }
