@@ -1,6 +1,7 @@
 package com.application.ravnandroidclient.client;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -21,7 +22,7 @@ import java.util.List;
  * Client Push holds the socket and recieves
  * push updates from server
  */
-public class ClientPush extends Thread{
+public class ClientPush implements Runnable{
     final static String TAG = "ClientPush";
     final static String ADDRESS = ClientApi.ADDRESS;
     final static int PUSH_PORT = 8380;
@@ -34,6 +35,9 @@ public class ClientPush extends Thread{
     Gson gson;
 
     static ClientPush sClient;
+
+    Handler handler = new Handler();
+
 
     public static ClientPush getClient() {
         if(sClient == null) sClient = new ClientPush();
@@ -73,7 +77,15 @@ public class ClientPush extends Thread{
                 String secondArgument = getSecondArgument(argument);
                 if(firstArgument.toLowerCase().contains("list")) {
                     GiphyList giphyList = gson.fromJson(secondArgument, GiphyList.class);
-                    notifySubscribers(giphyList);
+                    Log.d(TAG, "Sort field: " + giphyList.sortField);
+                    Log.d(TAG, "Sort type: " + giphyList.sortType);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifySubscribers(giphyList);
+                        }
+                    });
+
                 }
                 else if(firstArgument.toLowerCase().contains("exit")) {
                     System.out.println("Exit called");
@@ -127,7 +139,7 @@ public class ClientPush extends Thread{
             try {
                 mPushSocket = new Socket(ADDRESS, PUSH_PORT);
                 dPushIn = new DataInputStream(mPushSocket.getInputStream());
-                sClient.start(); //Start self
+                new Thread(sClient).start(); //Start self
                 return null;
             }catch (IOException e) {
                 Log.d(TAG, "Exception connecting:  " + e);

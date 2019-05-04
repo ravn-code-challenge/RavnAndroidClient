@@ -1,6 +1,8 @@
 package com.application.ravnandroidclient.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class GiphyList {
 
@@ -109,5 +111,6 @@ public class GiphyList {
             return SortField.ID;
         }
     }
+
 
 }

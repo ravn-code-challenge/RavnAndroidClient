@@ -6,17 +6,21 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.application.ravnandroidclient.client.ClientApi;
 import com.application.ravnandroidclient.client.GiphyList;
 
 
 public class SortActivity extends AppCompatActivity {
+
+    private static final String TAG = "SortActivity";
 
     Spinner fieldSpinner;
     Spinner sortTypeSpinner;
@@ -59,7 +63,13 @@ public class SortActivity extends AppCompatActivity {
                 R.array.sort_fields, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fieldSpinner.setAdapter(adapter);
+        Log.d(TAG, "Ordinal: " + ClientApi.getClient().mGiphyList.getSortField().ordinal());
         fieldSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal());
+//        fieldSpinner.setSelection(4);
+//        Log.d(TAG, "Field: " + ClientApi.getClient().mGiphyList.sortField);
+//        Log.d(TAG, "Index: " + ClientApi.getClient().mGiphyList.getSortField());
+
+
     }
 
     public void setUpSortAdapter() {
@@ -68,7 +78,7 @@ public class SortActivity extends AppCompatActivity {
                 R.array.sort_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortTypeSpinner.setAdapter(adapter);
-        sortTypeSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal());
+//        sortTypeSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal());
     }
 
     @Override
@@ -88,11 +98,16 @@ public class SortActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void finishAdd() {
+    public void finishSort() {
         finish();
     }
 
-    class SortAsyncTask extends AsyncTask<Void, Void, Boolean> {
+    void toastUser(String resultMessage) {
+        Toast.makeText(this, resultMessage, Toast.LENGTH_SHORT).show();
+    }
+
+
+    class SortAsyncTask extends AsyncTask<Void, Void, String> {
 
         int sortField = 0;
         int sortType = 0;
@@ -103,15 +118,21 @@ public class SortActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
+        protected String doInBackground(Void... voids) {
             GiphyList.SortField sortFieldEnum = GiphyList.SortField.values()[sortField];
             GiphyList.SortType sortTypeEnum = GiphyList.SortType.values()[sortType];
             return ClientApi.getClient().sort(sortFieldEnum, sortTypeEnum);
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            finishAdd();
+        protected void onPostExecute(String result) {
+            if(result != null) {
+                toastUser(result);
+            }
+            else {
+                finishSort();
+            }
+
         }
     }
 

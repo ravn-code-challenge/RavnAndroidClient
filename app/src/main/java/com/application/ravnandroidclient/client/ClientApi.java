@@ -138,12 +138,25 @@ public class ClientApi {
      * @param sortType
      * @return
      */
-    public boolean sort(GiphyList.SortField sortField, GiphyList.SortType sortType) {
-        mGiphyList.setSortField(sortField);
-        mGiphyList.setSortType(sortType);
-        Log.d(TAG, "Sort field: " + mGiphyList.sortField);
-        Log.d(TAG, "Sort type: " + mGiphyList.sortType);
-        return true;
+    public String sort(GiphyList.SortField sortField, GiphyList.SortType sortType) {
+        try {
+            mGiphyList.setSortField(sortField);
+            mGiphyList.setSortType(sortType);
+            Log.d(TAG, "Sort field: " + mGiphyList.sortField);
+            Log.d(TAG, "Sort type: " + mGiphyList.sortType);
+            dApiOut.writeUTF("sort/" + mGiphyList.sortField + "&" + mGiphyList.sortType);
+            String result = dApiIn.readUTF();
+            if(result.contains("ok")) {
+                return null;
+            }
+            else {
+                return result;
+            }
+
+        }catch (IOException e) {
+            Log.d(TAG, "Exception: " + e);
+        }
+        return "Sorting Failed";
     }
 
 
