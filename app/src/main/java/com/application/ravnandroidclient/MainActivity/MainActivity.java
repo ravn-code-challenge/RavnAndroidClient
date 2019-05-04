@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
 
     private static final String TAG = "MainActivity";
 
-    ClientApi mClient = ClientApi.getClient();
+    ClientPush mClient = ClientPush.getClient();
     Context mContext;
     private DrawerLayout dl;
     private ActionBarDrawerToggle t;

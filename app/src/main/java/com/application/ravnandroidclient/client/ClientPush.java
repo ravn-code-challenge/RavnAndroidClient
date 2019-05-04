@@ -21,7 +21,7 @@ import java.util.List;
  * Client Push holds the socket and recieves
  * push updates from server
  */
-public class ClientPush {
+public class ClientPush extends Thread{
     final static String TAG = "ClientPush";
     final static String ADDRESS = ClientApi.ADDRESS;
     final static int PUSH_PORT = 8380;
@@ -41,13 +41,63 @@ public class ClientPush {
     }
 
     private ClientPush() {
-        gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (
-                        json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (
-                        date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
-                .create();
+        gson = ClientApi.getClient().gson;
     }
+
+    String getFirstArgument(String arg) {
+        int index = arg.indexOf("{");
+        if(index != -1) {
+            return arg.substring(0, index);
+        }
+        else {
+            return arg;
+        }
+    }
+
+    String getSecondArgument(String arg) {
+        int index = arg.indexOf("/");
+        if(index != -1) {
+            return arg.substring(index+1);
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                String argument = dPushIn.readUTF();
+                String firstArgument = getFirstArgument(argument);
+                String secondArgument = getSecondArgument(argument);
+                if(firstArgument.toLowerCase().contains("list")) {
+                    GiphyList giphyList = gson.fromJson(secondArgument, GiphyList.class);
+                    notifySubscribers(giphyList);
+                }
+                else if(firstArgument.toLowerCase().contains("exit")) {
+                    System.out.println("Exit called");
+                    break;
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        try
+        {
+            // closing resources
+            this.dPushIn.close();
+            System.out.println("Thread has ended");
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+
 
     public void registerSubscriber(ClientSubscriber subscriber) {
         mClientSubscribers.add(subscriber);
@@ -58,6 +108,7 @@ public class ClientPush {
     }
 
     private void notifySubscribers(GiphyList giphyModels) {
+        ClientApi.getClient().mGiphyList = giphyModels;
         for(ClientSubscriber subscriber : mClientSubscribers) {
             subscriber.updateGiphyModels(ClientApi.getClient().mGiphyList);
         }
@@ -76,6 +127,7 @@ public class ClientPush {
             try {
                 mPushSocket = new Socket(ADDRESS, PUSH_PORT);
                 dPushIn = new DataInputStream(mPushSocket.getInputStream());
+                sClient.start(); //Start self
                 return null;
             }catch (IOException e) {
                 Log.d(TAG, "Exception connecting:  " + e);

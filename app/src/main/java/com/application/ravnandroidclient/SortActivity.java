@@ -74,7 +74,7 @@ public class SortActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mSortAsyncTask.cancel(true);
+        if(mSortAsyncTask != null) mSortAsyncTask.cancel(true);
     }
 
     @Override

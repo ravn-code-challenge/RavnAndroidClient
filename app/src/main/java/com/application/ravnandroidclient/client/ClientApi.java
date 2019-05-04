@@ -32,7 +32,6 @@ public class ClientApi {
 
 
     public GiphyList mGiphyList;
-    public List<ClientSubscriber> mClientSubscribers = new ArrayList<>();
 
     Gson gson;
 
@@ -52,20 +51,7 @@ public class ClientApi {
                 .create();
     }
 
-    public void registerSubscriber(ClientSubscriber subscriber) {
-        mClientSubscribers.add(subscriber);
-    }
 
-    public void removeSubscriber(ClientSubscriber s) {
-        mClientSubscribers.remove(s);
-    }
-
-    private void notifySubscribers(GiphyList giphyModels) {
-        mGiphyList = giphyModels;
-        for(ClientSubscriber subscriber : mClientSubscribers) {
-            subscriber.updateGiphyModels(mGiphyList);
-        }
-    }
 
     public String connect() {
         //Check if it is already connected.
@@ -210,27 +196,5 @@ public class ClientApi {
     }
 
 
-    class ListAsyncTask extends AsyncTask<Void, Void, GiphyList> {
-
-        @Override
-        protected GiphyList doInBackground(Void... voids) {
-            try {
-                dApiOut.writeUTF("list");
-                GiphyList giphyList = gson.fromJson(dApiIn.readUTF(), GiphyList.class);
-                return giphyList;
-            }
-            catch(IOException e) {
-                Log.d(TAG, "Error connecting socket" + e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(GiphyList models) {
-            if(models != null) {
-                notifySubscribers(models);
-            }
-        }
-    }
 
 }
