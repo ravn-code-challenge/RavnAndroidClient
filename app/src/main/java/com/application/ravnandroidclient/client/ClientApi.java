@@ -107,12 +107,21 @@ public class ClientApi {
         return "Failed to Disconnect";
     }
 
-    public void list() {
+    public String list() {
         if(mApiSocket == null || mApiSocket.isClosed()) {
-            return;
+            return "Not Connected";
         }
         else {
-            new ListAsyncTask().execute();
+            try {
+                dApiOut.writeUTF("list");
+                GiphyList giphyList = gson.fromJson(dApiIn.readUTF(), GiphyList.class);
+                mGiphyList = giphyList;
+                return null;
+            }
+            catch(IOException e) {
+                Log.d(TAG, "Error connecting socket" + e);
+            }
+            return "Error retrieving List";
         }
     }
 

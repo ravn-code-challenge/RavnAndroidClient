@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
 
     ConnectAsyncTask mConnectAsyncTask;
     DisconnectAsyncTask mDisconnectAsyncTask;
+    ListAsyncTask mListAsyncTask;
 
     @Override
     protected void onDestroy() {
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
         mClient.removeSubscriber(this);
         if(mConnectAsyncTask != null) mConnectAsyncTask.cancel(true);
         if(mDisconnectAsyncTask != null) mDisconnectAsyncTask.cancel(true);
+        if(mListAsyncTask != null) mListAsyncTask.cancel(true);
     }
 
     @Override
@@ -94,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
                         break;
                     case R.id.list_data:
                         Log.d(TAG, "List Data called");
-                        mClient.list();
+                        mListAsyncTask = new ListAsyncTask();
+                        mListAsyncTask.execute();
                         break;
                     case R.id.add_data:
                         Log.d(TAG, "Add data called");
@@ -174,6 +177,24 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
         protected void onPostExecute(String resultText) {
             toastUser(resultText);
 
+        }
+    }
+
+    class ListAsyncTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            return ClientApi.getClient().list();
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            if(response == null) {
+                updateGiphyModels(ClientApi.getClient().mGiphyList);
+            }
+            else {
+                toastUser(response);
+            }
         }
     }
 }
