@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.application.ravnandroidclient.GlideApp;
-import com.application.ravnandroidclient.client.Client;
+import com.application.ravnandroidclient.client.ClientApi;
 import com.application.ravnandroidclient.client.GiphyModel;
 
 import java.util.Calendar;
@@ -68,7 +68,7 @@ public class UpdateActivity extends EditActivity {
         circularProgressDrawable.start();
 
 
-        model = Client.getClient().getModel(getIntent().getLongExtra(GIPHY_ID_KEY, 1));
+        model = ClientApi.getClient().getModel(getIntent().getLongExtra(GIPHY_ID_KEY, 1));
         Log.d(TAG, "Model id: " + model.id);
 
         GlideApp.with(this)
@@ -111,7 +111,7 @@ public class UpdateActivity extends EditActivity {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            return Client.getClient().update(mGiphyModel);
+            return ClientApi.getClient().update(mGiphyModel);
         }
 
         @Override
@@ -131,7 +131,7 @@ public class UpdateActivity extends EditActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             Log.d(TAG, "Deleting id: " + giphyId);
-            return Client.getClient().remove(giphyId);
+            return ClientApi.getClient().remove(giphyId);
         }
 
         @Override

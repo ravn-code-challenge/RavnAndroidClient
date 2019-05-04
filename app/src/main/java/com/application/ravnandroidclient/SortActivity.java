@@ -12,9 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import com.application.ravnandroidclient.client.Client;
+import com.application.ravnandroidclient.client.ClientApi;
 import com.application.ravnandroidclient.client.GiphyList;
-import com.application.ravnandroidclient.client.GiphyModel;
 
 
 public class SortActivity extends AppCompatActivity {
@@ -60,7 +59,7 @@ public class SortActivity extends AppCompatActivity {
                 R.array.sort_fields, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fieldSpinner.setAdapter(adapter);
-        fieldSpinner.setSelection(Client.getClient().mGiphyList.getSortType().ordinal());
+        fieldSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal());
     }
 
     public void setUpSortAdapter() {
@@ -69,7 +68,7 @@ public class SortActivity extends AppCompatActivity {
                 R.array.sort_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortTypeSpinner.setAdapter(adapter);
-        sortTypeSpinner.setSelection(Client.getClient().mGiphyList.getSortType().ordinal());
+        sortTypeSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal());
     }
 
     @Override
@@ -107,7 +106,7 @@ public class SortActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... voids) {
             GiphyList.SortField sortFieldEnum = GiphyList.SortField.values()[sortField];
             GiphyList.SortType sortTypeEnum = GiphyList.SortType.values()[sortType];
-            return Client.getClient().sort(sortFieldEnum, sortTypeEnum);
+            return ClientApi.getClient().sort(sortFieldEnum, sortTypeEnum);
         }
 
         @Override

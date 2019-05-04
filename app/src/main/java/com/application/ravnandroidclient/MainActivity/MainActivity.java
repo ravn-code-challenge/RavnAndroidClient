@@ -1,6 +1,7 @@
 package com.application.ravnandroidclient.MainActivity;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -11,23 +12,25 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.application.ravnandroidclient.DetailActivity.AddActivity;
 import com.application.ravnandroidclient.DetailActivity.UpdateActivity;
 import com.application.ravnandroidclient.R;
 import com.application.ravnandroidclient.SortActivity;
-import com.application.ravnandroidclient.client.Client;
+import com.application.ravnandroidclient.client.ClientApi;
+import com.application.ravnandroidclient.client.ClientPush;
 import com.application.ravnandroidclient.client.ClientSubscriber;
 import com.application.ravnandroidclient.client.GiphyList;
 import com.application.ravnandroidclient.client.GiphyModel;
 
-import java.util.List;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements ClientSubscriber {
 
     private static final String TAG = "MainActivity";
 
-    Client mClient = Client.getClient();
+    ClientApi mClient = ClientApi.getClient();
     Context mContext;
     private DrawerLayout dl;
     private ActionBarDrawerToggle t;
@@ -35,11 +38,16 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
     private RecyclerView mRecyclerView;
     private GiphyAdapter mGiphyAdapter;
 
+    ConnectAsyncTask mConnectAsyncTask;
+    DisconnectAsyncTask mDisconnectAsyncTask;
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mClient.disconnect();
         mClient.removeSubscriber(this);
+        if(mConnectAsyncTask != null) mConnectAsyncTask.cancel(true);
+        if(mDisconnectAsyncTask != null) mDisconnectAsyncTask.cancel(true);
     }
 
     @Override
@@ -76,11 +84,13 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
                 {
                     case R.id.disconnect:
                         Log.d(TAG, "Disconnect called");
-                        mClient.disconnect();
+                        mDisconnectAsyncTask = new DisconnectAsyncTask();
+                        mDisconnectAsyncTask.execute();
                         break;
                     case R.id.connect:
                         Log.d(TAG, "Connect called");
-                        mClient.connect();
+                        mConnectAsyncTask = new ConnectAsyncTask();
+                        mConnectAsyncTask.execute();
                         break;
                     case R.id.list_data:
                         Log.d(TAG, "List Data called");
@@ -98,13 +108,14 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
                         return true;
                 }
 
-
                 return true;
 
             }
         });
 
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -118,6 +129,51 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
         Log.d(TAG, "We got new list in Mainactiity");
         if(mGiphyAdapter != null) {
             mGiphyAdapter.updateList(newList);
+        }
+    }
+
+    void toastUser(String resultMessage) {
+        if(resultMessage != null) {
+            Toast.makeText(this, resultMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    class ConnectAsyncTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            String apiResult = ClientApi.getClient().connect();
+            String pushResult = ClientPush.getClient().connect();
+
+            if(apiResult != null) return apiResult;
+            if(pushResult != null) return pushResult;
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String resultText) {
+            toastUser(resultText);
+
+        }
+    }
+
+
+    class DisconnectAsyncTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            String apiResult = ClientApi.getClient().disconnect();
+            String pushResult = ClientPush.getClient().disconnect();
+
+            if(apiResult != null) return apiResult;
+            if(pushResult != null) return pushResult;
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String resultText) {
+            toastUser(resultText);
+
         }
     }
 }

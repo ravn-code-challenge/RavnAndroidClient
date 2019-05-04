@@ -8,7 +8,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,13 +17,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Client {
-    final static String TAG = "Client";
+/**
+ * Client API holds the socket and handels all
+ * Requests and Response from Client.
+ */
+public class ClientApi {
+    final static String TAG = "ClientApi";
     final static String ADDRESS = "192.168.0.4";
-    final static int PORT = 8381;
-    Socket mSocket;
-    DataOutputStream dOut;
-    DataInputStream dIn;
+    final static int API_PORT = 8381;
+
+    Socket mApiSocket;
+    DataOutputStream dApiOut;
+    DataInputStream dApiIn;
 
 
     public GiphyList mGiphyList;
@@ -32,14 +36,14 @@ public class Client {
 
     Gson gson;
 
-    static Client sClient;
+    static ClientApi sClient;
 
-    public static Client getClient() {
-        if(sClient == null) sClient = new Client();
+    public static ClientApi getClient() {
+        if(sClient == null) sClient = new ClientApi();
         return sClient;
     }
 
-    private Client() {
+    private ClientApi() {
         gson = new GsonBuilder()
                 .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (
                         json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
@@ -63,29 +67,48 @@ public class Client {
         }
     }
 
-    public void connect() {
+    public String connect() {
         //Check if it is already connected.
-        if(mSocket != null && mSocket.isConnected()) {
+        if(mApiSocket != null && mApiSocket.isConnected()) {
             Log.d(TAG, "Socket is already connected");
-            return; //If so, do nothing
+            return "Already Connected"; //If so, do nothing
         }
         else {
             Log.d(TAG, "starting connect async task");
-            new ConnectAsyncTask().execute();
+            try {
+                Log.d(TAG, "Attemping to connect to socket");
+                mApiSocket = new Socket(ADDRESS, API_PORT);
+                dApiOut = new DataOutputStream(mApiSocket.getOutputStream());
+                dApiIn = new DataInputStream(mApiSocket.getInputStream());
+                return null;
+            }
+            catch(IOException e) {
+                Log.d(TAG, "Error connecting socket" + e);
+            }
         }
+        return "Connection failed";
     }
 
-    public void disconnect() {
-        if(mSocket == null || mSocket.isClosed()) {
-            return;
+    public String disconnect() {
+        if(mApiSocket == null || mApiSocket.isClosed()) {
+            return "Already Disconnected";
         }
         else {
-            new DisconnectAsyncTask().execute();
+            try {
+                dApiOut.writeUTF("exit");
+                mApiSocket.close();
+                mApiSocket = null;
+                return null;
+            }
+            catch(IOException e) {
+                Log.d(TAG, "Error connecting socket" + e);
+            }
         }
+        return "Failed to Disconnect";
     }
 
     public void list() {
-        if(mSocket == null || mSocket.isClosed()) {
+        if(mApiSocket == null || mApiSocket.isClosed()) {
             return;
         }
         else {
@@ -99,8 +122,8 @@ public class Client {
      */
     public boolean add(GiphyModel giphyModel) {
         try {
-            dOut.writeUTF("add/" + gson.toJson(giphyModel));
-            String response = dIn.readUTF();
+            dApiOut.writeUTF("add/" + gson.toJson(giphyModel));
+            String response = dApiIn.readUTF();
             if(response.toLowerCase().equals("ok")) {
                 Log.d(TAG, "Adding was successfull");
                 list();
@@ -138,8 +161,8 @@ public class Client {
     public boolean update(GiphyModel giphyModel) {
         try {
 
-            dOut.writeUTF("update/" + gson.toJson(giphyModel));
-            String response = dIn.readUTF();
+            dApiOut.writeUTF("update/" + gson.toJson(giphyModel));
+            String response = dApiIn.readUTF();
             if(response.toLowerCase().equals("ok")) {
                 Log.d(TAG, "Updating was successfull");
                 list();
@@ -155,8 +178,8 @@ public class Client {
 
     public boolean remove(long giphyId) {
         try {
-            dOut.writeUTF("remove/" + giphyId);
-            String response = dIn.readUTF();
+            dApiOut.writeUTF("remove/" + giphyId);
+            String response = dApiIn.readUTF();
             if(response.toLowerCase().equals("ok")) {
                 Log.d(TAG, "Deleting was successfull");
                 list(); //Get the new list
@@ -183,8 +206,8 @@ public class Client {
         @Override
         protected GiphyList doInBackground(Void... voids) {
             try {
-                dOut.writeUTF("list");
-                GiphyList giphyList = gson.fromJson(dIn.readUTF(), GiphyList.class);
+                dApiOut.writeUTF("list");
+                GiphyList giphyList = gson.fromJson(dApiIn.readUTF(), GiphyList.class);
                 return giphyList;
             }
             catch(IOException e) {
@@ -198,40 +221,6 @@ public class Client {
             if(models != null) {
                 notifySubscribers(models);
             }
-        }
-    }
-
-
-    class ConnectAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                Log.d(TAG, "Attemping to connect to socket");
-                mSocket = new Socket(ADDRESS, PORT);
-                dOut = new DataOutputStream(mSocket.getOutputStream());
-                dIn = new DataInputStream(mSocket.getInputStream());
-            }
-            catch(IOException e) {
-                Log.d(TAG, "Error connecting socket" + e);
-            }
-            return null;
-        }
-    }
-
-    class DisconnectAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                dOut.writeUTF("exit");
-                mSocket.close();
-                mSocket = null;
-            }
-            catch(IOException e) {
-                Log.d(TAG, "Error connecting socket" + e);
-            }
-            return null;
         }
     }
 
