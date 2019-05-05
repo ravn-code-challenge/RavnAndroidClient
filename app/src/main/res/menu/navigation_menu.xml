@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/disconnect"
-        android:title="disconnect"/>
+        android:title="1. Disconnect"/>
     <item android:id="@+id/connect"
-        android:title="Connect"/>
+        android:title="2. Connect"/>
     <item android:id="@+id/list_data"
-        android:title="List Data"/>
+        android:title="3. List Data"/>
     <item android:id="@+id/add_data"
-        android:title="Add Data"/>
+        android:title="4. Add Data"/>
     <item android:id="@+id/sort_data"
-        android:title="Sort Data"/>
+        android:title="5. Sort Data"/>
 
 </menu>

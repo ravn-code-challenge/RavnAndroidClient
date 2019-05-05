@@ -2,11 +2,13 @@ package com.application.ravnandroidclient.DetailActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -14,8 +16,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.application.ravnandroidclient.R;
+import com.application.ravnandroidclient.client.ClientApi;
 import com.application.ravnandroidclient.client.GiphyModel;
 
 import java.util.Date;
@@ -45,11 +49,6 @@ public class EditActivity extends AppCompatActivity {
     protected Context mContext;
 
 
-    public static Intent getAddIntent(Context context) {
-        Intent intent = new Intent(context, EditActivity.class);
-        return intent;
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,8 +72,6 @@ public class EditActivity extends AppCompatActivity {
         mBtDelete = findViewById(R.id.bt_delete);
         mTvViews = findViewById(R.id.tv_views);
         mTvDate = findViewById(R.id.tv_date);
-
-
     }
 
     /**
@@ -127,5 +124,15 @@ public class EditActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void toastUser(String resultMessage) {
+        if(resultMessage != null) {
+            Toast.makeText(this, resultMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void finishActivityFromAsyncTask() {
+        finish();
     }
 }

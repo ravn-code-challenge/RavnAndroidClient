@@ -105,7 +105,12 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
                         break;
                     case R.id.sort_data:
                         Log.d(TAG, "Sort Data");
-                        startActivity(SortActivity.getIntent(mContext));
+                        if(ClientApi.getClient().mGiphyList != null) {
+                            startActivity(SortActivity.getIntent(mContext));
+                        }
+                        else {
+                            toastUser("Nothing to sort");
+                        }
                         break;
                     default:
                         return true;
@@ -117,8 +122,6 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
         });
 
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

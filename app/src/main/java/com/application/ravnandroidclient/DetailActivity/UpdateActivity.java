@@ -25,6 +25,7 @@ public class UpdateActivity extends EditActivity {
     private static final String GIPHY_ID_KEY = "giphy_id";
     DeleteAsyncTask mDeleteAsyncTask;
     UpdateAsyncTask mUpdateAsyncTask;
+    IncrementViewCountAsyncTask mIncrementViewCountAsyncTask;
 
 
     public static Intent getIntent(Context context, long id) {
@@ -45,6 +46,7 @@ public class UpdateActivity extends EditActivity {
                     model.title = modelFromFields.title;
                     model.author = modelFromFields.author;
                     model.src = modelFromFields.src;
+                    Log.d(TAG, "Creating new update async task");
                     mUpdateAsyncTask = new UpdateAsyncTask(model);
                     mUpdateAsyncTask.execute();
                 }
@@ -86,7 +88,8 @@ public class UpdateActivity extends EditActivity {
         mEtAuthor.setText(model.author);
         mEtGiphySrc.setText(model.src);
 
-
+        mIncrementViewCountAsyncTask = new IncrementViewCountAsyncTask(model.id);
+        mIncrementViewCountAsyncTask.execute();
     }
 
 
@@ -97,11 +100,8 @@ public class UpdateActivity extends EditActivity {
         if(mDeleteAsyncTask != null) mDeleteAsyncTask.cancel(true );
     }
 
-    public void finishTask() {
-        finish();
-    }
 
-    class UpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
+    class UpdateAsyncTask extends AsyncTask<Void, Void, String> {
 
         GiphyModel mGiphyModel;
 
@@ -110,17 +110,23 @@ public class UpdateActivity extends EditActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
+        protected String doInBackground(Void... voids) {
             return ClientApi.getClient().update(mGiphyModel);
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            finishTask();
+        protected void onPostExecute(String result) {
+            if(result != null) {
+                toastUser(result);
+                mUpdateAsyncTask = null;
+            }
+            else {
+                finishActivityFromAsyncTask();
+            }
         }
     }
 
-    class DeleteAsyncTask extends AsyncTask<Void, Void, Boolean> {
+    class DeleteAsyncTask extends AsyncTask<Void, Void, String> {
 
         long giphyId;
 
@@ -129,16 +135,35 @@ public class UpdateActivity extends EditActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
-            Log.d(TAG, "Deleting id: " + giphyId);
+        protected String doInBackground(Void... voids) {
             return ClientApi.getClient().remove(giphyId);
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            if(result) {
-                finishTask();
+        protected void onPostExecute(String result) {
+            if(result != null) {
+                toastUser(result);
+                mDeleteAsyncTask = null;
+            }
+            else {
+                finishActivityFromAsyncTask();
             }
         }
+    }
+
+    class IncrementViewCountAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        long giphyId;
+
+        IncrementViewCountAsyncTask(long giphyId) {
+            this.giphyId = giphyId;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            ClientApi.getClient().incrementViewCount(giphyId);
+            return null;
+        }
+
     }
 }

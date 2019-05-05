@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -57,18 +58,19 @@ public class SortActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     public void setUpFieldAdapter() {
         fieldSpinner = findViewById(R.id.spinner_field);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_fields, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fieldSpinner.setAdapter(adapter);
+        fieldSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortField().ordinal(), false);
         Log.d(TAG, "Ordinal: " + ClientApi.getClient().mGiphyList.getSortField().ordinal());
-        fieldSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal());
-//        fieldSpinner.setSelection(4);
-//        Log.d(TAG, "Field: " + ClientApi.getClient().mGiphyList.sortField);
-//        Log.d(TAG, "Index: " + ClientApi.getClient().mGiphyList.getSortField());
-
 
     }
 
@@ -78,7 +80,8 @@ public class SortActivity extends AppCompatActivity {
                 R.array.sort_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortTypeSpinner.setAdapter(adapter);
-//        sortTypeSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal());
+        sortTypeSpinner.setSelection(ClientApi.getClient().mGiphyList.getSortType().ordinal(), false);
+
     }
 
     @Override

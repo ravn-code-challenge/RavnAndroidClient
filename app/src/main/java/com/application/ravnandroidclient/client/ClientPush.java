@@ -72,13 +72,13 @@ public class ClientPush implements Runnable{
     public void run() {
         while (true) {
             try {
+                Log.d(TAG, "Awaiting push request");
                 String argument = dPushIn.readUTF();
+                Log.d(TAG, "Got push request");
                 String firstArgument = getFirstArgument(argument);
                 String secondArgument = getSecondArgument(argument);
                 if(firstArgument.toLowerCase().contains("list")) {
                     GiphyList giphyList = gson.fromJson(secondArgument, GiphyList.class);
-                    Log.d(TAG, "Sort field: " + giphyList.sortField);
-                    Log.d(TAG, "Sort type: " + giphyList.sortType);
                     handler.post(new Runnable() {
                         @Override
                         public void run() {

@@ -13,6 +13,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -115,20 +116,19 @@ public class ClientApi {
      * Is done synchronously, returns true if succesful
      * @param giphyModel
      */
-    public boolean add(GiphyModel giphyModel) {
+    public String add(GiphyModel giphyModel) {
         try {
             dApiOut.writeUTF("add/" + gson.toJson(giphyModel));
             String response = dApiIn.readUTF();
             if(response.toLowerCase().equals("ok")) {
-                Log.d(TAG, "Adding was successfull");
-                list();
-                return true;
+//                Log.d(TAG, "Adding was successfull");
+                return null;
             }
             Log.d(TAG, "Adding was not successfull");
-            return false;
+            return response;
         }
         catch (IOException e) {
-            return false;
+            return e.getMessage();
         }
     }
 
@@ -142,8 +142,8 @@ public class ClientApi {
         try {
             mGiphyList.setSortField(sortField);
             mGiphyList.setSortType(sortType);
-            Log.d(TAG, "Sort field: " + mGiphyList.sortField);
-            Log.d(TAG, "Sort type: " + mGiphyList.sortType);
+//            Log.d(TAG, "Sort field: " + mGiphyList.sortField);
+//            Log.d(TAG, "Sort type: " + mGiphyList.sortType);
             dApiOut.writeUTF("sort/" + mGiphyList.sortField + "&" + mGiphyList.sortType);
             String result = dApiIn.readUTF();
             if(result.contains("ok")) {
@@ -154,52 +154,57 @@ public class ClientApi {
             }
 
         }catch (IOException e) {
-            Log.d(TAG, "Exception: " + e);
+            return e.getMessage();
         }
-        return "Sorting Failed";
     }
 
-
-
-        /**
-         *
-         * @param giphyModel
-         * @return
-         */
-    public boolean update(GiphyModel giphyModel) {
+    /**
+     *
+     * @param giphyModel
+     * @return
+     */
+    public String update(GiphyModel giphyModel) {
         try {
 
             dApiOut.writeUTF("update/" + gson.toJson(giphyModel));
             String response = dApiIn.readUTF();
             if(response.toLowerCase().equals("ok")) {
                 Log.d(TAG, "Updating was successfull");
-                list();
-                return true;
+                return null;
             }
-            Log.d(TAG, "Updating was not successfull");
-            return false;
+            else {
+                return response;
+            }
         }
         catch (IOException e) {
-            return false;
+            return e.getMessage();
         }
     }
 
-    public boolean remove(long giphyId) {
+    public String remove(long giphyId) {
         try {
             dApiOut.writeUTF("remove/" + giphyId);
             String response = dApiIn.readUTF();
             if(response.toLowerCase().equals("ok")) {
                 Log.d(TAG, "Deleting was successfull");
-                list(); //Get the new list
-                return true;
+                return null;
             }
-            Log.d(TAG, "Deleting was not successfull");
-            return false;
+            return response;
         }
         catch (IOException e) {
-            return false;
+            return e.getMessage();
         }
     }
+
+    public void incrementViewCount(long giphyId) {
+        try {
+            dApiOut.writeUTF("viewcount/" + giphyId);
+        }
+        catch (IOException e) {
+            Log.d(TAG, "View count incrementing");
+        }
+    }
+
 
     public GiphyModel getModel(long id) {
         for(GiphyModel model : mGiphyList.models) {

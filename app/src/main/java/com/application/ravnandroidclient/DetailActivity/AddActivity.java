@@ -67,15 +67,10 @@ public class AddActivity extends EditActivity {
         if(mAddAsyncTask != null) {
             mAddAsyncTask.cancel(true);
         }
-
-
     }
 
-    public void finishAdd() {
-        finish();
-    }
 
-    class AddAsyncTask extends AsyncTask<Void, Void, Boolean> {
+    class AddAsyncTask extends AsyncTask<Void, Void, String> {
 
         GiphyModel mGiphyModel;
 
@@ -84,13 +79,19 @@ public class AddActivity extends EditActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
+        protected String doInBackground(Void... voids) {
             return ClientApi.getClient().add(mGiphyModel);
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            finishAdd();
+        protected void onPostExecute(String result) {
+            if(result != null) {
+                toastUser(result);
+                mAddAsyncTask = null;
+            }
+            else {
+                finishActivityFromAsyncTask();
+            }
         }
     }
 }
