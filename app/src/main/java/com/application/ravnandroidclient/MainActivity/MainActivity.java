@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.application.ravnandroidclient.ConnectionActivity.ConnectionActivity;
 import com.application.ravnandroidclient.DetailActivity.AddActivity;
 import com.application.ravnandroidclient.DetailActivity.UpdateActivity;
 import com.application.ravnandroidclient.R;
@@ -23,8 +24,6 @@ import com.application.ravnandroidclient.client.ClientPush;
 import com.application.ravnandroidclient.client.ClientSubscriber;
 import com.application.ravnandroidclient.client.GiphyList;
 import com.application.ravnandroidclient.client.GiphyModel;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements ClientSubscriber {
 
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
     private RecyclerView mRecyclerView;
     private GiphyAdapter mGiphyAdapter;
 
-    ConnectAsyncTask mConnectAsyncTask;
     DisconnectAsyncTask mDisconnectAsyncTask;
     ListAsyncTask mListAsyncTask;
 
@@ -47,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
         super.onDestroy();
         mClient.disconnect();
         mClient.removeSubscriber(this);
-        if(mConnectAsyncTask != null) mConnectAsyncTask.cancel(true);
         if(mDisconnectAsyncTask != null) mDisconnectAsyncTask.cancel(true);
         if(mListAsyncTask != null) mListAsyncTask.cancel(true);
     }
@@ -91,8 +88,9 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
                         break;
                     case R.id.connect:
                         Log.d(TAG, "Connect called");
-                        mConnectAsyncTask = new ConnectAsyncTask();
-                        mConnectAsyncTask.execute();
+                        startActivity(ConnectionActivity.getIntent(mContext));
+//                        mConnectAsyncTask = new ConnectAsyncTask();
+//                        mConnectAsyncTask.execute();
                         break;
                     case R.id.list_data:
                         Log.d(TAG, "List Data called");
@@ -144,24 +142,7 @@ public class MainActivity extends AppCompatActivity implements ClientSubscriber 
         }
     }
 
-    class ConnectAsyncTask extends AsyncTask<Void, Void, String> {
 
-        @Override
-        protected String doInBackground(Void... voids) {
-            String apiResult = ClientApi.getClient().connect();
-            String pushResult = ClientPush.getClient().connect();
-
-            if(apiResult != null) return apiResult;
-            if(pushResult != null) return pushResult;
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String resultText) {
-            toastUser(resultText);
-
-        }
-    }
 
 
     class DisconnectAsyncTask extends AsyncTask<Void, Void, String> {

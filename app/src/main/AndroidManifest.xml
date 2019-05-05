@@ -20,6 +20,8 @@
         <activity android:name=".DetailActivity.UpdateActivity"/>
         <activity android:name=".DetailActivity.AddActivity"/>
         <activity android:name=".SortActivity"/>
+        <activity android:name=".ConnectionActivity.ConnectionActivity"
+            android:windowSoftInputMode="adjustResize"/>
 
     </application>
 

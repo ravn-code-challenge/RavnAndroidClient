@@ -1,6 +1,5 @@
 package com.application.ravnandroidclient.client;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -13,10 +12,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Client API holds the socket and handels all
@@ -24,13 +20,13 @@ import java.util.List;
  */
 public class ClientApi {
     final static String TAG = "ClientApi";
-    final static String ADDRESS = "192.168.0.4";
+    final static String DEFAULT_ADDRESS = "192.168.0.4";
     final static int API_PORT = 8381;
 
     Socket mApiSocket;
     DataOutputStream dApiOut;
     DataInputStream dApiIn;
-
+    public String currentAddress = DEFAULT_ADDRESS;
 
     public GiphyList mGiphyList;
 
@@ -54,7 +50,8 @@ public class ClientApi {
 
 
 
-    public String connect() {
+    public String connect(String address) {
+        currentAddress = address;
         //Check if it is already connected.
         if(mApiSocket != null && mApiSocket.isConnected()) {
             Log.d(TAG, "Socket is already connected");
@@ -64,7 +61,7 @@ public class ClientApi {
             Log.d(TAG, "starting connect async task");
             try {
                 Log.d(TAG, "Attemping to connect to socket");
-                mApiSocket = new Socket(ADDRESS, API_PORT);
+                mApiSocket = new Socket(currentAddress, API_PORT);
                 dApiOut = new DataOutputStream(mApiSocket.getOutputStream());
                 dApiIn = new DataInputStream(mApiSocket.getInputStream());
                 return null;

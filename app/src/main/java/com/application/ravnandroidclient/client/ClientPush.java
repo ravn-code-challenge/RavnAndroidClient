@@ -1,21 +1,14 @@
 package com.application.ravnandroidclient.client;
 
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,7 +17,6 @@ import java.util.List;
  */
 public class ClientPush implements Runnable{
     final static String TAG = "ClientPush";
-    final static String ADDRESS = ClientApi.ADDRESS;
     final static int PUSH_PORT = 8380;
 
     Socket mPushSocket;
@@ -129,7 +121,7 @@ public class ClientPush implements Runnable{
     /**
      * Called within Client A
      */
-    public String connect() {
+    public String connect(String address) {
         //Check if it is already connected.
         if(mPushSocket != null && mPushSocket.isConnected()) {
             Log.d(TAG, "Push Socket is already connected");
@@ -137,7 +129,7 @@ public class ClientPush implements Runnable{
         }
         else {
             try {
-                mPushSocket = new Socket(ADDRESS, PUSH_PORT);
+                mPushSocket = new Socket(address, PUSH_PORT);
                 dPushIn = new DataInputStream(mPushSocket.getInputStream());
                 new Thread(sClient).start(); //Start self
                 return null;
