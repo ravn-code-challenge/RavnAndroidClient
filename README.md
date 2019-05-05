@@ -18,22 +18,56 @@ the IP address of their local machine.
 2. Detail and Thumbnails for the media.
 
 
-## Starting Up
+## 1. Starting the Server
 
 1. git pull https://github.com/ravn-code-challenge/RavenServer
 2. Open in IntelliJ and Run
 
-<img src="./readmeResources/StartUp.gf" alt="gif" height="200"/>
+<img src="readmeResources/StartUpServer.gif" alt="gif" height="400" hspace="25"/>
 
-## End Result
+## 2. Connecting the Client
 
-End result using mock data
+1. git pull https://github.com/ravn-code-challenge/RavnAndroidClient
+2. Open in Android Studio and Run
+3. Open Navigation Drawer
+4. Press Connect
+5. Input the IP your Server is serving on (Local Machine's IP)
+6. Press List to see the media from Server
 
-<!-- <img src="recorder.gif" alt="drawing" width="200"/> -->
+<img src="readmeResources/StartUp.gif" alt="gif" height="450" hspace="25"/>
 
+## 3. Adding GIF's
+1. Open Nav Drawer and press Add
+2. Input title, author, and Giphy Address (https://media.giphy.com/media/AqfOVseMPDVja/giphy.gif)
+3. Press Add
+(Will be pushed to all other clients) 
+
+<img src="readmeResources/Adding.gif" alt="gif" height="450" hspace="25"/>
+
+## 3. Updating/Removing GIF's
+
+1. Click on gif from main list
+2. Make changes and update or Remove
+
+<img src="readmeResources/Removing.gif" alt="gif" height="450" hspace="25"/>
+
+## 3. Sorting GIF's
+
+1. Open Nav Drawer and press Sort
+2. Pick which field to sort on
+3. Pick the type of sort
+4. Press sort
+
+<img src="readmeResources/Sorting.gif" alt="gif" height="450" hspace="25"/>
+
+## 4. Writing Changes to Persistance Storage
+
+1. In Server Console, type 4
+
+<img src="readmeResources/Writing.gif" alt="gif" height="450" hspace="25"/>
 
 ## Contributing
-This was a coding challenge issued from AT&T on 3/20/2019 for the position Android Engineer. There will be no more contribution to this project after 3/27/19
+This was a coding challenge issued from Ravn on 5/1/2019 for the position Android Engineer. There will be no more contribution to this project after 5/5/19
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
