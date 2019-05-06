@@ -44,14 +44,14 @@ the IP address of their local machine.
 
 <img src="readmeResources/Adding.gif" alt="gif" height="450" hspace="25"/>
 
-## 3. Updating/Removing GIF's
+## 4. Updating/Removing GIF's
 
 1. Click on gif from main list
 2. Make changes and update or Remove
 
 <img src="readmeResources/Removing.gif" alt="gif" height="450" hspace="25"/>
 
-## 3. Sorting GIF's
+## 5. Sorting GIF's
 
 1. Open Nav Drawer and press Sort
 2. Pick which field to sort on
@@ -60,7 +60,7 @@ the IP address of their local machine.
 
 <img src="readmeResources/Sorting.gif" alt="gif" height="450" hspace="25"/>
 
-## 4. Writing Changes to Persistance Storage
+## 6. Writing Changes to Persistance Storage
 
 1. In Server Console, type 4
 
